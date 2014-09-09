@@ -9,10 +9,14 @@ package de.sanandrew.mods.particledeco.block;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import de.sanandrew.mods.particledeco.client.util.ClientProxy;
+import de.sanandrew.mods.particledeco.tileentity.TileEntityParticleBox;
 import de.sanandrew.mods.particledeco.util.PDM_Main;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
@@ -21,6 +25,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockParticleBox
     extends Block
+    implements ITileEntityProvider
 {
     @SideOnly(Side.CLIENT)
     public IIcon[] icons;
@@ -133,6 +138,39 @@ public class BlockParticleBox
     }
 
     @Override
+    public boolean canBlockStay(World world, int x, int y, int z) {
+        ForgeDirection dir = ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z) & 7);
+        x -= dir.offsetX;
+        y -= dir.offsetY;
+        z -= dir.offsetZ;
+
+        return world.getBlock(x, y, z) != null && world.getBlock(x, y, z).isOpaqueCube();
+    }
+
+    @Override
+    public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int side) {
+        ForgeDirection dir = ForgeDirection.getOrientation(side);
+        x -= dir.offsetX;
+        y -= dir.offsetY;
+        z -= dir.offsetZ;
+
+        return world.getBlock(x, y, z) != null && world.getBlock(x, y, z).isOpaqueCube();
+    }
+
+    @Override
+    public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbor) {
+        super.onNeighborBlockChange(world, x, y, z, neighbor);
+        this.checkAndDropBlock(world, x, y, z);
+    }
+
+    protected void checkAndDropBlock(World world, int x, int y, int z) {
+        if( !this.canBlockStay(world, x, y, z) ) {
+            this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+            world.setBlock(x, y, z, Blocks.air, 0, 2);
+        }
+    }
+
+    @Override
     public void registerBlockIcons(IIconRegister iconRegister) {
         this.icons = new IIcon[6];
         this.icons[0] = iconRegister.registerIcon(PDM_Main.MOD_ID + ":pd_box_bottom");
@@ -150,5 +188,10 @@ public class BlockParticleBox
         float[] boxOff = getBoxOffset(ForgeDirection.UP);
 
         this.setBlockBounds(boxOff[0], boxOff[1], boxOff[2], boxOff[3], boxOff[4], boxOff[5]);
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(World world, int meta) {
+        return new TileEntityParticleBox();
     }
 }
