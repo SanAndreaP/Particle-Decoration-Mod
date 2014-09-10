@@ -6,11 +6,11 @@
  *******************************************************************************************************************/
 package de.sanandrew.mods.particledeco.client.particle;
 
-import net.minecraft.client.particle.EntityFX;
+import de.sanandrew.core.manpack.mod.client.particle.EntityParticle;
 import net.minecraft.world.World;
 
 public class EntityDustFX
-    extends EntityFX
+    extends EntityParticle
 {
     public EntityDustFX(World world, double x, double y, double z, double flyHeight, double motX, double motY, double motZ) {
         super(world, x, y, z);
@@ -18,7 +18,7 @@ public class EntityDustFX
         this.motionY = motY;
         this.motionZ = motZ;
         this.setParticleTextureIndex(7);
-        this.particleMaxAge = 12 * 20 - 6;
+        this.particleMaxAge = 12 * 5 - 6;
 
         this.particleRed = this.particleGreen = this.particleBlue = 0.2F;
 
@@ -26,22 +26,19 @@ public class EntityDustFX
         this.particleRed *= rndColorMulti;
         this.particleGreen *= rndColorMulti;
         this.particleBlue *= rndColorMulti;
+
+        this.noClip = true;
     }
 
-    public void onUpdate()
-    {
+    public void onUpdate() {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
 
-        if (this.particleAge++ >= this.particleMaxAge)
-        {
+        if( this.particleAge++ >= this.particleMaxAge ) {
             this.setDead();
         }
 
-//        if( this.particleMaxAge - this.particleAge <= 20 ) {
-//            this.particleAlpha = (this.particleMaxAge - this.particleAge) / 20F;
-//        }
         this.particleScale += 0.05F;
 
         this.moveEntity(this.motionX, this.motionY, this.motionZ);

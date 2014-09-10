@@ -6,10 +6,9 @@
  *******************************************************************************************************************/
 package de.sanandrew.mods.particledeco.tileentity;
 
-import de.sanandrew.core.manpack.util.client.SAPClientUtils;
 import de.sanandrew.mods.particledeco.client.particle.EntityDustFX;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.EntityFX;
+import de.sanandrew.core.manpack.mod.client.particle.EntityParticle;
+import de.sanandrew.core.manpack.mod.client.particle.SAPEffectRenderer;
 import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityParticleBox
@@ -25,8 +24,8 @@ public class TileEntityParticleBox
         this.ticksExisted++;
 
         if( this.worldObj.isRemote && this.ticksExisted % 2 == 0 ) {
-            EntityFX particle = new EntityDustFX(this.worldObj, this.xCoord + 0.5F, this.yCoord + 0.5F, this.zCoord + 0.5F, 10.0F, 0.0F, 0.075F, 0.0F);
-            SAPClientUtils.addEffectWithNoLimit(Minecraft.getMinecraft().effectRenderer, particle);
+            EntityParticle particle = new EntityDustFX(this.worldObj, this.xCoord + 0.5F, this.yCoord + 0.5F, this.zCoord + 0.5F, 10.0F, 0.0F, 0.075F, 0.0F);
+            SAPEffectRenderer.INSTANCE.addEffect(particle);
         }
     }
 }
