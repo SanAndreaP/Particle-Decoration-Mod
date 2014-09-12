@@ -15,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -114,6 +115,12 @@ public class BlockParticleBox
     @Override
     public int onBlockPlaced(World world, int x, int y, int z, int side, float offX, float offY, float offZ, int meta) {
         return side & 7;
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float offX, float offY, float offZ) {
+        player.openGui(PDM_Main.MOD_ID, 0, world, x, y, z);
+        return true;
     }
 
     @Override

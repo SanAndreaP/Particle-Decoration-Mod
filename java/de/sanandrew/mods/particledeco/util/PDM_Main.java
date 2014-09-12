@@ -50,6 +50,8 @@ public final class PDM_Main
 //
         RegistryItems.initialize();
         RegistryBlocks.initialize();
+
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
     }
 
     @Mod.EventHandler

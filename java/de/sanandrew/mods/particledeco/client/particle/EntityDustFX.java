@@ -20,8 +20,6 @@ public class EntityDustFX
         this.setParticleTextureIndex(7);
         this.particleMaxAge = 12 * 5 - 6;
 
-        this.particleRed = this.particleGreen = this.particleBlue = 0.2F;
-
         float rndColorMulti = 0.6F + this.rand.nextFloat() * 0.4F;
         this.particleRed *= rndColorMulti;
         this.particleGreen *= rndColorMulti;
@@ -39,7 +37,7 @@ public class EntityDustFX
             this.setDead();
         }
 
-        this.particleScale += 0.05F;
+//        this.particleScale += 0.05F;
 
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
 
