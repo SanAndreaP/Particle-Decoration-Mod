@@ -8,6 +8,7 @@ package de.sanandrew.mods.particledeco.util;
 
 import cpw.mods.fml.common.network.IGuiHandler;
 import de.sanandrew.mods.particledeco.client.gui.GuiParticleBox;
+import de.sanandrew.mods.particledeco.tileentity.TileEntityParticleBox;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
@@ -21,6 +22,6 @@ public class GuiHandler
 
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return new GuiParticleBox();
+        return new GuiParticleBox((TileEntityParticleBox) world.getTileEntity(x, y, z));
     }
 }

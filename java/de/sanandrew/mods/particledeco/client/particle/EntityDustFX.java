@@ -12,13 +12,15 @@ import net.minecraft.world.World;
 public class EntityDustFX
     extends EntityParticle
 {
-    public EntityDustFX(World world, double x, double y, double z, double flyHeight, double motX, double motY, double motZ) {
+    public EntityDustFX(World world, double x, double y, double z, double flyHeight, double speed, double motX, double motY, double motZ) {
         super(world, x, y, z);
-        this.motionX = motX;
-        this.motionY = motY;
-        this.motionZ = motZ;
+        this.motionX = motX * speed;
+        this.motionY = motY * speed;
+        this.motionZ = motZ * speed;
+
         this.setParticleTextureIndex(7);
-        this.particleMaxAge = 12 * 5 - 6;
+
+        this.particleMaxAge = (int) ((12.6D * flyHeight - 6.0D) / speed);
 
         float rndColorMulti = 0.6F + this.rand.nextFloat() * 0.4F;
         this.particleRed *= rndColorMulti;
@@ -37,13 +39,7 @@ public class EntityDustFX
             this.setDead();
         }
 
-//        this.particleScale += 0.05F;
-
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
-
-//        this.motionX *= 0.96D;
-//        this.motionY *= 0.96D;
-//        this.motionZ *= 0.96D;
 
         if (this.onGround)
         {

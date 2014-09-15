@@ -8,8 +8,13 @@ package de.sanandrew.mods.particledeco.tileentity;
 
 import de.sanandrew.core.manpack.mod.client.particle.EntityParticle;
 import de.sanandrew.core.manpack.mod.client.particle.SAPEffectRenderer;
+import de.sanandrew.core.manpack.util.SAPUtils;
 import de.sanandrew.mods.particledeco.client.particle.EntityDustFX;
+import de.sanandrew.mods.particledeco.util.ParticleBoxData;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -17,12 +22,11 @@ public class TileEntityParticleBox
     extends TileEntity
 {
     private int ticksExisted;
-    private float[] colors = new float[] {1.0F, 1.0F, 1.0F};
+    public ParticleBoxData particleData = new ParticleBoxData();
+    public int prevColor = this.particleData.particleColor;
+    public float[] particleColorSplit = SAPUtils.getRgbaFromColorInt(this.particleData.particleColor).getColorFloatArray();
 
     public TileEntityParticleBox() {
-        colors[0] = 0.0F;
-        colors[2] = 0.0F;
-//        colors[1] = 0.0F;
     }
 
     public boolean canUpdate() {
@@ -34,14 +38,20 @@ public class TileEntityParticleBox
         this.ticksExisted++;
 
         if( this.worldObj.isRemote && this.ticksExisted % 2 == 0 ) {
+            if( this.prevColor != this.particleData.particleColor ) {
+                this.particleColorSplit = SAPUtils.getRgbaFromColorInt(this.particleData.particleColor).getColorFloatArray();
+                this.prevColor = this.particleData.particleColor;
+            }
+
             ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata());
 
             float motionX = 0.075F * dir.offsetX;
             float motionY = 0.075F * dir.offsetY;
             float motionZ = 0.075F * dir.offsetZ;
 
-            EntityParticle particle = new EntityDustFX(this.worldObj, this.xCoord + 0.5F, this.yCoord + 0.5F, this.zCoord + 0.5F, 10.0F, motionX, motionY, motionZ);
-            particle.setParticleColor(this.colors[0], this.colors[1], this.colors[2]);
+            EntityParticle particle = new EntityDustFX(this.worldObj, this.xCoord + 0.5F, this.yCoord + 0.5F, this.zCoord + 0.5F, this.particleData.particleHeight,
+                                                       this.particleData.particleSpeed, motionX, motionY, motionZ);
+            particle.setParticleColorRNG(this.particleColorSplit[0], this.particleColorSplit[1], this.particleColorSplit[2]);
             particle.setBrightness(0xF0);
             SAPEffectRenderer.INSTANCE.addEffect(particle);
         }
@@ -51,17 +61,26 @@ public class TileEntityParticleBox
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        nbt.setFloat("particleRed", this.colors[0]);
-        nbt.setFloat("particleGreen", this.colors[1]);
-        nbt.setFloat("particleBlue", this.colors[2]);
+        this.particleData.writeDataToNBT(nbt);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        this.colors[0] = nbt.getFloat("particleRed");
-        this.colors[1] = nbt.getFloat("particleGreen");
-        this.colors[2] = nbt.getFloat("particleBlue");
+        this.particleData = ParticleBoxData.getDataFromNbt(nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+        this.particleData = ParticleBoxData.getDataFromNbt(pkt.func_148857_g());
+    }
+
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        this.particleData.writeDataToNBT(nbt);
+
+        return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
     }
 }

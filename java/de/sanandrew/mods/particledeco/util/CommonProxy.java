@@ -6,9 +6,11 @@
  *******************************************************************************************************************/
 package de.sanandrew.mods.particledeco.util;
 
+import de.sanandrew.mods.particledeco.network.ServerPacketHandler;
+
 public class CommonProxy
 {
     public void modInit() {
-
+        PDM_Main.channel.register(new ServerPacketHandler());
     }
 }
