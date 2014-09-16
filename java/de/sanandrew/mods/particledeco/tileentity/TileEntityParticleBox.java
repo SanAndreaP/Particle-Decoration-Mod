@@ -17,6 +17,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 public class TileEntityParticleBox
     extends TileEntity
@@ -43,14 +44,11 @@ public class TileEntityParticleBox
                 this.prevColor = this.particleData.particleColor;
             }
 
-            ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata());
-
-            float motionX = 0.075F * dir.offsetX;
-            float motionY = 0.075F * dir.offsetY;
-            float motionZ = 0.075F * dir.offsetZ;
+            MutableFloat[] motions = new MutableFloat[] {new MutableFloat(0.0F), new MutableFloat(0.0F), new MutableFloat(0.0F)};
+            this.changeDirection(motions[0], motions[1], motions[2]);
 
             EntityParticle particle = new EntityDustFX(this.worldObj, this.xCoord + 0.5F, this.yCoord + 0.5F, this.zCoord + 0.5F, this.particleData.particleHeight,
-                                                       this.particleData.particleSpeed, motionX, motionY, motionZ);
+                                                       this.particleData.particleSpeed, motions[0].getValue(), motions[1].getValue(), motions[2].getValue());
             particle.setParticleColorRNG(this.particleColorSplit[0], this.particleColorSplit[1], this.particleColorSplit[2]);
             particle.setBrightness(0xF0);
             SAPEffectRenderer.INSTANCE.addEffect(particle);
@@ -82,5 +80,30 @@ public class TileEntityParticleBox
         this.particleData.writeDataToNBT(nbt);
 
         return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, nbt);
+    }
+
+    private void changeDirection(MutableFloat motionX, MutableFloat motionY, MutableFloat motionZ) {
+        ForgeDirection dir = ForgeDirection.getOrientation(this.getBlockMetadata());
+        switch( this.particleData.particleSpread ) {
+            case SPREADED_FOUR_DIAG:
+                int ticksMod = this.ticksExisted % 5;
+                if( ticksMod != 0 ) {
+                    float facingMulti = 0.025F - (ticksMod % 2) * 0.5F;
+                    motionX.setValue(0.05F * dir.offsetX + facingMulti * (ticksMod < 3 ? dir.offsetY : dir.offsetZ));
+                    motionY.setValue(0.05F * dir.offsetY + facingMulti * (ticksMod < 3 ? dir.offsetZ : dir.offsetX));
+                    motionZ.setValue(0.05F * dir.offsetZ + facingMulti * (ticksMod < 3 ? dir.offsetX : dir.offsetY));
+                } else {
+                    motionX.setValue(0.075F * dir.offsetX);
+                    motionY.setValue(0.075F * dir.offsetY);
+                    motionZ.setValue(0.075F * dir.offsetZ);
+                }
+
+                break;
+            case STRAIGHT_UP:
+                motionX.setValue(0.075F * dir.offsetX);
+                motionY.setValue(0.075F * dir.offsetY);
+                motionZ.setValue(0.075F * dir.offsetZ);
+                break;
+        }
     }
 }

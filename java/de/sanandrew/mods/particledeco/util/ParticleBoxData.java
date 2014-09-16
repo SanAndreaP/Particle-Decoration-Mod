@@ -16,9 +16,9 @@ public final class ParticleBoxData
 {
     public int particleColor = 0xFFFFFF;
     public float particleHeight = 5.0F;
-    public float particleSpeed = 0.15F;
+    public float particleSpeed = 1.0F;
     public EnumParticleType particleType = EnumParticleType.DUST;
-    public EnumParticleSpread particleSpread = EnumParticleSpread.STRAIGHT_UP;
+    public EnumParticleSpread particleSpread = EnumParticleSpread.SPREADED_FOUR_DIAG;
 
     public ParticleBoxData() {
     }
@@ -80,7 +80,8 @@ public final class ParticleBoxData
 
     public static enum EnumParticleSpread
     {
-        STRAIGHT_UP;
+        STRAIGHT_UP,
+        SPREADED_FOUR_DIAG;
 
         public static EnumParticleSpread[] values = values();
     }
