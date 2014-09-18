@@ -88,7 +88,7 @@ public class TileEntityParticleBox
             case SPREADED_FOUR_DIAG:
                 int ticksMod = this.ticksExisted % 5;
                 if( ticksMod != 0 ) {
-                    float facingMulti = 0.025F - (ticksMod % 2) * 0.5F;
+                    float facingMulti = 0.025F - (ticksMod % 2) * 0.05F;
                     motionX.setValue(0.05F * dir.offsetX + facingMulti * (ticksMod < 3 ? dir.offsetY : dir.offsetZ));
                     motionY.setValue(0.05F * dir.offsetY + facingMulti * (ticksMod < 3 ? dir.offsetZ : dir.offsetX));
                     motionZ.setValue(0.05F * dir.offsetZ + facingMulti * (ticksMod < 3 ? dir.offsetX : dir.offsetY));
