@@ -7,7 +7,11 @@
 package de.sanandrew.mods.particledeco.client.particle;
 
 import de.sanandrew.core.manpack.mod.client.particle.EntityParticle;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class EntityDustFX
     extends EntityParticle
@@ -46,5 +50,17 @@ public class EntityDustFX
             this.motionX *= 0.7D;
             this.motionZ *= 0.7D;
         }
+
+        //TODO: test for "matter particles"
+        List<Entity> eL = this.worldObj.getEntitiesWithinAABB(Entity.class, this.boundingBox);
+        for( Entity e : eL ) {
+            e.motionY = 0.1D;
+        }
+    }
+
+    @Override
+    public void onCollideWithPlayer(EntityPlayer p_70100_1_) {
+        super.onCollideWithPlayer(p_70100_1_);
+        p_70100_1_.motionY = 0.01D;
     }
 }
